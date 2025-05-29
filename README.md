@@ -2,7 +2,7 @@
 
 An AI agent powered by Claude 4.0 Sonnet that can download, analyze, and compare SEC 10-K filings from EDGAR. The agent provides both quantitative financial analysis and qualitative insights from narrative sections.
 
-**Note**: This agent provides analysis based on publicly available SEC filings, and LLMs make mistakes. Always verify important financial information and consult with financial professionals for investment decisions.
+**Note**: This agent provides analysis based on publicly available SEC filings, and LLMs make mistakes -- and this was a quick POC to learn about LLM-based document parsing and Q&A, so your mileage may vary/ expect bugs. Always verify important financial information. Don't make investment decisions based on this bot.
 
 ## 🚀 Key Features
 
