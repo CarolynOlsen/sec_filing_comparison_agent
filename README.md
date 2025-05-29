@@ -1,11 +1,13 @@
 # SEC Filing Comparison Agent
 
-A sophisticated AI agent powered by Claude 4.0 Sonnet that can download, analyze, and compare SEC 10-K filings from EDGAR. The agent provides both quantitative financial analysis and qualitative insights from narrative sections.
+An AI agent powered by Claude 4.0 Sonnet that can download, analyze, and compare SEC 10-K filings from EDGAR. The agent provides both quantitative financial analysis and qualitative insights from narrative sections.
+
+**Note**: This agent provides analysis based on publicly available SEC filings, and LLMs make mistakes. Always verify important financial information and consult with financial professionals for investment decisions.
 
 ## 🚀 Key Features
 
-### **Intelligent Data Filtering** ⭐ NEW!
-- **LLM-Powered Filtering**: Uses Claude to intelligently filter massive SEC datasets based on your specific question
+### **Intelligent Data Filtering** 
+- **LLM-Powered Filtering**: Uses Claude to intelligently filter large SEC datasets based on your specific question
 - **Context-Aware Analysis**: Automatically identifies relevant financial concepts, time periods, and metrics
 - **Token Limit Prevention**: Eliminates "context length exceeded" errors by extracting only relevant data
 - **Fallback Mechanisms**: Multiple filtering strategies ensure robust operation
@@ -19,9 +21,8 @@ A sophisticated AI agent powered by Claude 4.0 Sonnet that can download, analyze
 
 ### **Advanced Capabilities**
 - **Structured 10-K Parsing**: Extracts specific sections (Business, Risk Factors, MD&A, Financials)
-- **Interactive Chat Interface**: Natural language queries for complex analysis
+- **Chat Interface**: Natural language queries for complex analysis -- Currently does _not_ have memory across questions; that is an area for future improvement
 - **Type-Safe Architecture**: Built with Pydantic for robust data validation
-- **Conversation Memory**: Maintains context across multiple queries
 
 ## 🧠 How Intelligent Filtering Works
 
@@ -63,50 +64,17 @@ SEC_USER_AGENT=Your Company Name admin@yourcompany.com
 
 ## 🚀 Quick Start
 
-### Interactive Chat
-```python
-from filing_agent.core.anthropic_client import AnthropicSecAgent
-
-async def main():
-    agent = AnthropicSecAgent()
-    
-    # Ask complex questions - intelligent filtering handles large datasets
-    response = await agent.chat("What is Hartford's combined ratio and how has it changed over time?")
-    print(response)
-    
-    # Multi-company analysis
-    response = await agent.chat("Compare Apple and Microsoft's profit margins")
-    print(response)
-
-# Run the chat
-import asyncio
-asyncio.run(main())
-```
-
-### Command Line Chat
 ```bash
-python scripts/chat_with_sec_agent.py
-```
-
-## 🧪 Testing
-
-### Test Intelligent Filtering
-```bash
-python scripts/test_intelligent_filtering.py
-```
-
-### Test Enhanced Capabilities
-```bash
-python scripts/test_enhanced_agent.py
+python scripts/quick_chat.py
 ```
 
 ## 📊 Example Queries
 
 The agent can handle complex questions that previously caused token limit errors:
 
-- **Insurance Metrics**: "What is Hartford's combined ratio and loss ratio trends?"
 - **Growth Analysis**: "Analyze Apple's revenue growth over the past 3 years"
 - **Profitability**: "Compare Microsoft's profit margins to industry averages"
+- **Insurance Metrics**: "What is American Family Insurance's combined ratio and loss ratio trends?"
 - **Risk Assessment**: "What are Tesla's main business risks according to their 10-K?"
 - **Strategic Analysis**: "How has Amazon's business strategy evolved based on their filings?"
 
@@ -147,84 +115,11 @@ The agent automatically configures tools based on your questions:
 - **Token Limits**: 100KB threshold for filtering activation
 - **Fallback Keywords**: Insurance, revenue, profit, and other financial terms
 
-## 🎯 Use Cases
-
-### Financial Analysis
-- Calculate and compare financial ratios
-- Analyze revenue and profit trends
-- Assess financial health and performance
-
-### Risk Assessment
-- Extract and analyze risk factors
-- Compare risk profiles across companies
-- Identify emerging business risks
-
-### Strategic Research
-- Understand business models and strategies
-- Analyze competitive positioning
-- Track strategic changes over time
-
-### Investment Research
-- Comprehensive due diligence
-- Peer comparison analysis
-- Long-term trend identification
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- **Anthropic Claude**: For powerful LLM capabilities and function calling
-- **SEC EDGAR**: For providing free access to financial data
-- **Pydantic**: For robust data validation and type safety (not the AI agent framework)
-
 ---
 
 ## 🧠 Challenges and Learnings
 
 This project tackled common challenges in AI document processing and comparison. Here are the practical methods we tested and what worked:
-
----
-
-### 🔧 Challenge: Document Format Detection
-
-**Problem**: File extensions don't indicate internal content structure. Documents often mix multiple formats within a single file.
-
-**Example - XBRL Case**:
-*XBRL = eXtensible Business Reporting Language, used for financial data*
-```
-# Hartford's filing: "hig-20241231.htm" 
-# Extension suggests: HTML document
-# Actual content: Inline XBRL (financial data tags + narrative HTML)
-# Problem: Can't tell from .htm extension what's inside
-```
-
-**Common Mixed-Format Examples**:
-- **PDFs**: Text + embedded images + form fields + tables
-- **HTML**: Markup + embedded scripts + multimedia + structured data
-- **Word docs**: Text + embedded charts + tables + comments
-- **Jupyter notebooks**: Code + markdown + outputs + metadata
-
-**Methods Tested**:
-1. **File extension analysis** - Unreliable for mixed formats
-2. **Content sampling** - Check first 1000 chars for format indicators
-3. **Investigative content analysis** - ✅ **Worked best**
-   - **File size check**: The Hartford's 1.1M chars suggested substantial content beyond pure XBRL
-   - **Tag presence**: Found both `<ix:` XBRL tags AND `Item 1`, `Item 1A` section headers  
-   - **Content sampling**: First few KB showed forward-looking statements (narrative content)
-   - **Section count**: Verified 12+ standard 10-K sections present
-   - **Conclusion**: Document contains both XBRL structure AND narrative content (Inline XBRL)
-
-**Key Learning**: Always validate document structure through content analysis, not file extensions.
 
 ---
 
@@ -263,7 +158,7 @@ This project tackled common challenges in AI document processing and comparison.
    - Document chunks were too large for LLM context
    - Standard patterns were present but LLM gave inconsistent responses
 
-**Key Learning**: Use LLMs for pattern recognition, not content measurement. Always implement regex fallbacks.
+**Key Learning**: Use LLMs for pattern recognition, not content measurement. Implement regex fallbacks.
 
 ---
 
@@ -342,91 +237,6 @@ next_sections = section_sequence[current_index + 1:current_index + 4]
 
 ---
 
-### 🔧 Challenge: Path Mapping and User Interface
-
-**Problem**: Users request sections with friendly names (`Part1.Item1A`) but internal structure uses technical keys (`part_1.item_1a`).
-
-**Methods Tested**:
-1. **String normalization** - Failed with complex variations
-2. **Hardcoded mapping tables** - Brittle for new formats
-3. **LLM-driven mapping** - ✅ **Worked best**
-   ```python
-   def get_section_by_path(self, parsed_filing, user_path):
-       # Use LLM to map user path to internal structure
-       # Fallback to normalized string matching
-       # Return FilingSection object
-   ```
-
----
-
-### 📊 Common AI Document Processing Patterns
-
-Based on this project, here are reusable patterns for AI document processing:
-
-#### **1. Multi-Stage Content Validation**
-```python
-def validate_document_content(content):
-    # Stage 1: Format detection
-    # Stage 2: Structure validation  
-    # Stage 3: Content sampling
-    # Stage 4: Expected section verification
-```
-
-#### **2. Hierarchical Boundary Detection**
-```python
-def find_section_boundary(content, section_id):
-    # Primary: LLM pattern recognition
-    # Fallback: Regex with format-specific patterns
-    # Safety: Position-based extraction
-```
-
-#### **3. Intelligent Pre-processing Pipeline**
-```python
-def preprocess_document(raw_content):
-    # 1. Remove metadata and boilerplate
-    # 2. Clean HTML/markup noise
-    # 3. Identify content vs navigation elements
-    # 4. Apply format-specific cleanup
-```
-
-#### **4. Token-Aware Content Extraction**
-```python
-def extract_with_token_management(document, target_sections):
-    # Calculate content priorities
-    # Process high-priority chunks first
-    # Summarize metadata, extract full narrative
-    # Progressive loading for complete coverage
-```
-
----
-
-### 📈 Performance Results
-
-| Approach | Before | After | Key Improvement |
-|----------|--------|-------|-----------------|
-| **Content Accuracy** | TOC extraction (736 chars) | Narrative content (42k chars) | Found actual content vs references |
-| **Boundary Detection** | Fixed-size chunks | Section-aware boundaries | Preserved section integrity |
-| **Processing Efficiency** | 100% of raw content | 77% after cleanup | 23% noise reduction |
-| **Token Management** | Context overflow errors | Targeted extraction | Eliminated token limits |
-
----
-
-### 🔄 Reusable Techniques for Other Document Types
-
-These methods apply to many AI document processing tasks:
-
-- **Legal Contracts**: Section detection, clause boundaries, standard format leverage
-- **Academic Papers**: Abstract vs content, citation cleanup, figure handling
-- **Technical Documentation**: API section detection, code block boundaries, cross-references
-- **Medical Records**: Structured data vs narratives, standard form knowledge
-- **Financial Reports**: Beyond SEC to international formats, table extraction
-
-**Core Pattern**: Combine LLM intelligence for pattern recognition with format-specific knowledge and robust fallback mechanisms.
-
----
-
-**Note**: This agent provides analysis based on publicly available SEC filings. Always verify important financial information and consult with financial professionals for investment decisions.
-
 ## Visual Content Extraction Implementation ✅
 
 The agent successfully implements visual content extraction and summarization from 10-K filings. Here's what was accomplished:
@@ -475,23 +285,6 @@ if section_visuals:
     section_content += visual_summaries
 ```
 
-### 📊 Content Quality Examples
-
-**Risk Factors Section:**
-- Table of contents with page numbers (38-114)
-- Financial report structure and organization
-
-**Business Section:**
-- Workers' Compensation coverage descriptions
-- Hartford Funds investment categories (60 mutual funds)
-- Product definitions across insurance lines
-
-**MD&A Section (Item 7):**
-- Share repurchase data: 3.46M shares at $117.57/share
-- $3.15B remaining in authorized repurchase programs
-- Prior accident year development tables
-- Financial metrics in millions/billions
-
 ### 🔧 Configuration Options
 
 **Chunk Processing:**
@@ -521,24 +314,6 @@ section = parser.get_section_by_path(result, "Part2.Item7")
 print(f"Visual elements: {len(section.visual_elements)}")
 print(f"Content with visuals: {section.content}")
 ```
-
-### ✅ Success Metrics
-
-The implementation successfully addresses the original requirement:
-> "Visual content (images/tables in 10-Ks) wasn't being summarized as originally intended"
-
-**Achievements:**
-- ✅ Visual elements detected and summarized using LLM
-- ✅ Section-specific content (no more duplicate securities tables)
-- ✅ Meaningful financial data extraction (share repurchases, performance metrics)
-- ✅ Integrated visual summaries in section content
-- ✅ Scalable across different 10-K filings and sections
-
-**Future Enhancements:**
-- Extract visual elements from section text chunks (for non-HTML table data)
-- Support for charts and images (currently focuses on tables)
-- Enhanced financial keyword detection for specialized industries
-- Direct image processing for chart data extraction 
 
 ---
 
@@ -782,34 +557,6 @@ class OptimizedLLMProcessor:
         self.batch_queue.clear()
 ```
 
-#### **2.5 Implementation Priority Order**
-
-**Week 1: Quick Wins**
-1. Add filing cache system (FilingCache class)
-2. Implement response caching for identical questions
-3. Pre-compute Hartford metrics (combined ratio, loss ratio) for instant demo
-
-**Week 2: Architecture**  
-1. Set up MCP server with optimized tool calling
-2. Implement parallel filing processing
-3. Add conversation memory to AnthropicSecAgent
-
-**Week 3: Performance**
-1. Background metric pre-computation for popular companies
-2. Batch LLM processing for efficiency
-3. Database storage for persistent caching
-
-#### **2.6 Success Metrics**
-
-**Performance Benchmarks**:
-- "What is Hartford's combined ratio?" → Target: < 3 seconds (Currently: 60+ seconds)
-- "Compare Hartford vs Chubb loss ratios" → Target: < 10 seconds  
-- Subsequent questions about same company → Target: < 1 second (cached)
-
-**Memory Benchmarks**:
-- Maintain context across 10+ question conversation
-- Remember company data across entire session
-- Smart context injection (only relevant previous answers)
 
 **Implementation Files to Create**:
 - `src/filing_agent/core/filing_cache.py`
