@@ -26,7 +26,7 @@ An AI agent powered by Claude 4.0 Sonnet that can download, analyze, and compare
 
 ## 🧠 How Intelligent Filtering Works
 
-When you ask a question like "What is Hartford's combined ratio?", the system:
+When you ask a question like "What is State Farm's combined ratio?", the system:
 
 1. **Analyzes Your Question**: Claude examines your query to identify relevant financial concepts
 2. **Samples Large Datasets**: Takes a representative sample of massive SEC data for analysis
@@ -74,7 +74,7 @@ The agent can handle complex questions that previously caused token limit errors
 
 - **Growth Analysis**: "Analyze Apple's revenue growth over the past 3 years"
 - **Profitability**: "Compare Microsoft's profit margins to industry averages"
-- **Insurance Metrics**: "What is American Family Insurance's combined ratio and loss ratio trends?"
+- **Insurance Metrics**: "What is State Farm's combined ratio and loss ratio trends?"
 - **Risk Assessment**: "What are Tesla's main business risks according to their 10-K?"
 - **Strategic Analysis**: "How has Amazon's business strategy evolved based on their filings?"
 
@@ -250,7 +250,7 @@ The agent successfully implements visual content extraction and summarization fr
 - ✅ **MD&A**: Financial performance tables with millions/billions in metrics
 
 **Performance Metrics:**
-- 📄 **Document Size**: 10.3M characters (Hartford 2024 10-K)
+- 📄 **Document Size**: 10.3M characters (The Hartford 2024 10-K)
 - 🧹 **Pre-processing**: Removed 262K characters (23.7%) of boilerplate
 - 📊 **Visual Elements**: 8 meaningful tables extracted across 4 sections
 - 🔍 **Section Detection**: Successfully parsed 6 chunks to find Item 7 (MD&A)
@@ -411,12 +411,7 @@ async def chat(self, message: str) -> str:
 
 ### ⚡ Priority 2: Performance Optimization
 
-**Problem**: Taking 60+ seconds to answer "What is Hartford's combined ratio?" - unacceptable UX.
-
-**Performance Targets**:
-- Simple metrics (combined ratio): < 5 seconds
-- Complex analysis: < 15 seconds  
-- Multi-company comparison: < 20 seconds
+**Problem**: Taking 60+ seconds to answer "What is State Farm's combined ratio?" - unacceptable UX.
 
 #### **2.1 Implement MCP Server Architecture**
 ```python
